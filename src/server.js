@@ -6,8 +6,23 @@ const PORT = process.env.PORT || 3000;
 
 const app = express()
 
+let exercises = [
+        {
+            id: crypto.randomUUID(),
+            name: "From Server",
+            musclePart: "Back",
+            type: "Machine"
+        },
+        {
+            id: crypto.randomUUID(),
+            name: "Lat Pulldown",
+            musclePart: "Back",
+            type: "Machine"
+        },
+    ]
+
 app.use(cors({
-    origin: ['http://localhost:5173/', 'https://optymal.vercel.app']
+    origin: ['http://localhost:5173', 'https://optymal.vercel.app']
 }))
 
 app.use(express.json())
@@ -17,113 +32,35 @@ app.get('/', (req, res) => {
 })
 
 app.get('/exercises', (req, res) => {
-    res.json([
-        {
-            name: "From Server",
-            musclePart: "Back",
-            type: "Machine"
-        },
-        {
-            name: "Lat Pulldown",
-            musclePart: "Back",
-            type: "Machine"
-        },
-
-        {
-            name: "Bench Press",
-            musclePart: "Chest",
-            type: "Barbell"
-        },
-
-        {
-            name: "Lateral Raises",
-            musclePart: "Shoulders",
-            type: "Cable"
-        },
-        {
-            name: "Shoulder Press",
-            musclePart: "Shoulders",
-            type: "Machine"
-        },
-        {
-            name: "Stiff Leg Deadlift",
-            musclePart: "Hamstrings",
-            type: "Barbell"
-        },
-        {
-            name: "Wide Grip Rows",
-            musclePart: "Upper Back",
-            type: "Machine"
-        },
-        {
-            name: "Lateral Raises",
-            musclePart: "Shoulders",
-            type: "Cable"
-        },
-        {
-            name: "Lateral Raises",
-            musclePart: "Shoulders",
-            type: "Cable"
-        },
-    ])
+    res.json(exercises)
 })
 
 app.post('/exercises', (req, res) => {
-    const exercises = req.body;
+    const {name, musclePart, type} = req.body
+    const exercise = {
+        name,
+        musclePart,
+        type,
+        id: crypto.randomUUID(),
+    };
 
-    console.log("Received: ", exercises);
+    if (!name || !musclePart || !type) {
+        res.status(400).json({ error: 'Missing required fields!'})
+    }
 
-    res.json({ message: "Data received!", data: exercises});
+    console.log("Received: ", exercise);
+
+    exercises.push(exercise)
+
+    res.status(201).json({ message: "Data received!", data: exercise});
 })
 
-app.get('/exercises/:name', (req, res) => {
-    const name = req.params.name
-    const exercises = [
-        {
-            name: "Lat Pulldown",
-            musclePart: "Back",
-            type: "Machine"
-        },
+app.get('/exercises/:id', (req, res) => {
+    const id = req.params.id
+    const exercise = exercises.find((ex) => ex.id === id)
 
-        {
-            name: "Bench Press",
-            musclePart: "Chest",
-            type: "Barbell"
-        },
-
-        {
-            name: "Lateral Raises",
-            musclePart: "Shoulders",
-            type: "Cable"
-        },
-        {
-            name: "Shoulder Press",
-            musclePart: "Shoulders",
-            type: "Machine"
-        },
-        {
-            name: "Stiff Leg Deadlift",
-            musclePart: "Hamstrings",
-            type: "Barbell"
-        },
-        {
-            name: "Wide Grip Rows",
-            musclePart: "Upper Back",
-            type: "Machine"
-        },
-        {
-            name: "Lateral Raises",
-            musclePart: "Shoulders",
-            type: "Cable"
-        },
-        {
-            name: "Lateral Raises",
-            musclePart: "Shoulders",
-            type: "Cable"
-        },
-    ]
-
-    res.json(exercises.find((exercise) => name.toLowerCase() === exercise.name.toLowerCase()))
+    if (!exercise) return res.status(401).json({message: 'Exercise not found.'})
+    res.json(exercise)
 })
 
 app.listen(PORT, () => {
