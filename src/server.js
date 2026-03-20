@@ -10,6 +10,8 @@ app.use(cors({
     origin: ['http://localhost:5173/', 'https://optymal.vercel.app']
 }))
 
+app.use(express.json())
+
 app.get('/', (req, res) => {
     res.send('Putanginamo')
 })
@@ -64,6 +66,14 @@ app.get('/exercises', (req, res) => {
             type: "Cable"
         },
     ])
+})
+
+app.post('/exercises', (req, res) => {
+    const exercises = req.body;
+
+    console.log("Received: ", exercises);
+
+    res.json({ message: "Data received!", data: exercises});
 })
 
 app.get('/exercises/:name', (req, res) => {
