@@ -55,6 +55,37 @@ app.post('/exercises', (req, res) => {
     res.status(201).json({ message: "Data received!", data: exercise});
 })
 
+app.put('/exercises/:id', (req, res) => {
+    const { newName, newMusclePart, newType } = req.body;
+    const id = req.params.id
+    if (!newName || !newMusclePart || !newType) {
+        res.status(400).json({ error: 'Missing required fields: ' + !newName ? "name" : "" + !newMusclePart ? "musclePart" : "" + !newType ? "type" : ""})
+    }
+    const exerciseToEdit = exercises.find((ex) => ex.id === id)
+
+    if (!exerciseToEdit) return res.status(401).json({message: 'Exercise not found.'})
+    
+    exercises = exercises.map((ex) => {
+        if (ex.id === id) {
+            return ex = {
+                id: id,
+                name: newName,
+                musclePart: newMusclePart,
+                type: newType
+            }
+        } else {
+            return ex
+        }
+    })
+
+    res.status(200).json({message: 'Exercise successfully edited.', data: {
+        id,
+        name: newName,
+        musclePart: newMusclePart,
+        type: newType
+    }})
+})
+
 app.get('/exercises/:id', (req, res) => {
     const id = req.params.id
     const exercise = exercises.find((ex) => ex.id === id)
