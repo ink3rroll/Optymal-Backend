@@ -59,11 +59,11 @@ app.put('/exercises/:id', (req, res) => {
     const { newName, newMusclePart, newType } = req.body;
     const id = req.params.id
     if (!newName || !newMusclePart || !newType) {
-        res.status(400).json({ error: 'Missing required fields: ' + !newName ? "name" : "" + !newMusclePart ? "musclePart" : "" + !newType ? "type" : ""})
+        return res.status(400).json({ error: 'Missing required fields'})
     }
     const exerciseToEdit = exercises.find((ex) => ex.id === id)
 
-    if (!exerciseToEdit) return res.status(401).json({message: 'Exercise not found.'})
+    if (!exerciseToEdit) return res.status(404).json({message: 'Exercise not found.'})
     
     exercises = exercises.map((ex) => {
         if (ex.id === id) {
