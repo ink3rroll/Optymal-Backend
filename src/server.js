@@ -38,10 +38,10 @@ app.get('/exercises', (req, res) => {
 app.post('/exercises', (req, res) => {
     const {name, musclePart, type} = req.body
     const exercise = {
+        id: crypto.randomUUID(),
         name,
         musclePart,
         type,
-        id: crypto.randomUUID(),
     };
 
     if (!name || !musclePart || !type) {
@@ -90,8 +90,21 @@ app.get('/exercises/:id', (req, res) => {
     const id = req.params.id
     const exercise = exercises.find((ex) => ex.id === id)
 
-    if (!exercise) return res.status(401).json({message: 'Exercise not found.'})
+    if (!exercise) return res.status(404).json({message: 'Exercise not found.'})
     res.json(exercise)
+})
+
+app.delete('/exercises/:id', (req, res) => {
+    const id = req.params.id
+    const exercise = exercises.find((ex) => ex.id === id)
+
+    
+
+    if (!exercise) return res.status(404).json({message: 'Exercise not found.'})
+
+    exercises = exercises.filter((ex) => ex.id !== id)
+
+    res.json({message: "Successfuly deleted: " + exercise})
 })
 
 app.listen(PORT, () => {
