@@ -21,6 +21,8 @@ let exercises = [
         },
     ]
 
+let currentSession = null;
+
 app.use(cors({
     origin: ['http://localhost:5173', 'https://optymal.vercel.app']
 }))
@@ -105,6 +107,36 @@ app.delete('/exercises/:id', (req, res) => {
     exercises = exercises.filter((ex) => ex.id !== id)
 
     res.json({message: "Successfuly deleted: " + exercise})
+})
+
+app.get('/currentsession', (req, res) => {
+    res.json(currentSession)
+})
+
+app.post('/currentsession', (req, res) => {
+    console.log("Started new session.")
+    currentSession = {
+        "startTime": Date.now(),
+        "currentExercises": []
+    }
+
+    res.status(201).json({message: "Started workout session. ", data: currentSession})      
+})
+
+app.put('/currentsession', (req, res) => {
+    console.log("Update session: " + JSON.stringify(req.body))
+    const { startTime, currentExercises } = req.body
+
+    if (!startTime || !currentExercises) {
+        return res.status(404).json({message: "Invalid session update."})
+    }
+
+    currentSession = {
+        startTime,
+        currentExercises
+    }
+
+    res.status(200).json({message: "Successful update.", data: currentSession})
 })
 
 app.listen(PORT, () => {
